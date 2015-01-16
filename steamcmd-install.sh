@@ -18,18 +18,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# Lets define some vars to simplify our life
+user="steam"
+steamcmd="/home/$user/steamcmd/"
+gamedir="/home/$user/gamedir/"
+
 # We need 32bits paquets for SteamCMD
-if [ "getconf LONG_BIT" = '64' ]; then
+if [[ "getconf LONG_BIT" == '64' ]]; then
     dpkg --add-architecture i386 && apt-get update && apt-get install -y ia32-libs ia32-libs-gtk
 fi
 
 # Lets create a user "steam" with no passwd and no shell
-useradd -r -m steam
-su steam -c "mkdir home/steam/steamcmd/ && mkdir /home/steam/gameserver/"
+id -u $user &>/dev/null || useradd -r -m $user
+su $user -c "mkdir $steamcmd && mkdir $gamedir"
 
 # Time to install SteamCMD
-su steam -c "cd /home/steam/steamcmd && wget http://media.steampowered.com/client/steamcmd_linux.tar.gz && tar -xvzf steamcmd_linux.tar.gz"
+su $user -c "cd $steamcmd && rm steamcmd_linux.tar.gz* && wget http://media.steampowered.com/client/steamcmd_linux.tar.gz"
+if [[ "$?" != 0 ]]; then
+    echo "[ERROR] An error happend during the download."
+    exit 1
+fi
 #TODO : implement a md5 check
+su $user -c "cd $steamcmd && tar -xvzf steamcmd_linux.tar.gz"
+su $user -c "cd $steamcmd && rm steamcmd_linux.tar.gz*"
 
 # And to run it one time to check updates
-su steam -c "cd /home/steam/steamcmd && ./steamcmd.sh +quit"
+su $user -c "cd $steamcmd && ./steamcmd.sh +quit"
+
+# That's all (folks)
