@@ -22,6 +22,7 @@
 user="steam"
 steamcmd="/home/$user/steamcmd/"
 gamedir="/home/$user/gamedir/"
+chkhash=""
 
 # We need 32bits paquets for SteamCMD
 if [[ "getconf LONG_BIT" == '64' ]]; then
@@ -40,6 +41,14 @@ if [[ "$?" != 0 ]]; then
 fi
 #TODO : implement a md5 check
 su $user -c "cd $steamcmd && tar -xvzf steamcmd_linux.tar.gz"
+su $user -c chkhash=$(md5sum steamcmd_linux.tar.gz | cut -d' ' -f1)
+if test "$chkhash" == "09e3f75c1ab5a501945c8c8b10c7f50e" 
+then
+  echo ----- Checksum OK -------
+else
+  echo ----- Checksum FAIL ------- $chkhash
+  exit
+fi
 su $user -c "cd $steamcmd && rm steamcmd_linux.tar.gz*"
 
 # And to run it one time to check updates
