@@ -3,4 +3,5 @@ The idea is to provide (at least) a script to create and delete any HL server us
 
 
 ## Credits
-Based on work of _Daan Kemps_ (https://dl.dropboxusercontent.com/u/12554673/tutorials/serverstutorial.pdf)
+Based on work of _Daan Kemps_ (https://dl.dropboxusercontent.com/u/12554673/tutorials/serverstutorial.pdf),
+_Chk_ (http://chikoumi.com/blog/post/installer-un-serveur-csgo)
