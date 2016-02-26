@@ -22,7 +22,9 @@
 user="steam"
 steamcmd="/home/$user/steamcmd/"
 gamedir="/home/$user/gamedir/"
-chkhash=""
+filehash=""
+steamcmdhash="09e3f75c1ab5a501945c8c8b10c7f50e"
+
 
 # We need 32bits paquets for SteamCMD
 if [[ "getconf LONG_BIT" == '64' ]]; then
@@ -30,25 +32,27 @@ if [[ "getconf LONG_BIT" == '64' ]]; then
 fi
 
 # Lets create a user "steam" with no passwd and no shell
-id -u $user &>/dev/null || useradd -r -m $user
-su $user -c "mkdir $steamcmd && mkdir $gamedir"
+id -u ${user} &>/dev/null || useradd -r -m ${user}
+su ${user} -c "mkdir ${steamcmd} && mkdir ${gamedir}"
 
 # Time to install SteamCMD
-su $user -c "cd $steamcmd && rm steamcmd_linux.tar.gz* && wget http://media.steampowered.com/client/steamcmd_linux.tar.gz"
+su ${user} -c "cd ${steamcmd} && rm steamcmd_linux.tar.gz* && wget http://media.steampowered.com/client/steamcmd_linux.tar.gz"
 if [[ "$?" != 0 ]]; then
     echo "[ERROR] An error happend during the download."
     exit 1
 fi
 #TODO : implement a md5 check
-su $user -c "cd $steamcmd && tar -xvzf steamcmd_linux.tar.gz"
-su $user -c chkhash=$(md5sum steamcmd_linux.tar.gz | cut -d' ' -f1)
-if test "$chkhash" == "09e3f75c1ab5a501945c8c8b10c7f50e" 
+su ${user} -c "cd ${steamcmd} && tar -xvzf steamcmd_linux.tar.gz"
+filehash=$(md5sum steamcmd_linux.tar.gz | cut -d' ' -f1)
+if test ${filehash} == ${steamcmdhash} 
 then
-  echo ----- Checksum OK -------
+  echo "[OK] md5 validation is good, continuing"
 else
-  echo ----- Checksum FAIL ------- $chkhash
+  echo "[ERROR] Invalide md5 : " ${chkhash}
   exit
 fi
+
+# Let's purge some unsued files
 su $user -c "cd $steamcmd && rm steamcmd_linux.tar.gz*"
 
 # And to run it one time to check updates
