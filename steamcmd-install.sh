@@ -34,16 +34,16 @@ id -u $user &>/dev/null || useradd -r -m $user
 su $user -c "mkdir $steamcmd && mkdir $gamedir"
 
 # Time to install SteamCMD
-su $user -c "cd $steamcmd && rm steamcmd_linux.tar.gz* && wget http://media.steampowered.com/client/steamcmd_linux.tar.gz"
+su $user -c "cd $steamcmd && rm steamcmd_linux.tar.gz* || wget http://media.steampowered.com/client/steamcmd_linux.tar.gz"
 if [[ "$?" != 0 ]]; then
     echo "[ERROR] An error happend during the download."
     exit 1
 fi
 #TODO : implement a md5 check
-su $user -c "cd $steamcmd && tar -xvzf steamcmd_linux.tar.gz"
-su $user -c chkhash=$(md5sum steamcmd_linux.tar.gz | cut -d' ' -f1)
+cd $steamcmd && chkhash=$(md5sum $steamcmd/steamcmd_linux.tar.gz | cut -d' ' -f1)
 if test "$chkhash" == "09e3f75c1ab5a501945c8c8b10c7f50e" 
 then
+  su $user -c "cd $steamcmd && tar -xvzf steamcmd_linux.tar.gz"
   echo ----- Checksum OK -------
 else
   echo ----- Checksum FAIL ------- $chkhash
